@@ -29,6 +29,7 @@ async function run() {
 
     const productCollection = client.db('productDB').collection('products')
     const cartCollection= client.db('productDB').collection('cart')
+    const feedbackCollection= client.db('productDB').collection('feedback')
 
     app.get('/products', async (req, res) => {
       const cursor = productCollection.find()
@@ -69,7 +70,6 @@ async function run() {
           brand: updatedProduct.brand,
           type: updatedProduct.type,
           price: updatedProduct.price,
-          description: updatedProduct.description,
           rating: updatedProduct.rating,
         }
       }
@@ -96,7 +96,17 @@ async function run() {
       res.send(result)
     })
 
-    
+    app.delete('/cart/:id', async(req,res)=>{
+      const id= req.params.id
+        const query= {_id: new ObjectId(id)}
+        const result= await cartCollection.deleteOne(query)
+        res.send(result)
+    })
+    app.post('/feedback', async(req,res)=>{
+      const feedback= req.body
+      const result= await feedbackCollection.insertOne(feedback)
+      res.send(result)
+    })
     
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
